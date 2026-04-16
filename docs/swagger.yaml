@@ -1,0 +1,88 @@
+basePath: /
+definitions:
+  github_com_razdolbaipozhizni_effective-mobile-subscription-service_internal_model.Subscription:
+    properties:
+      created_at:
+        type: string
+      end_date:
+        description: может быть null
+        type: string
+      id:
+        type: integer
+      price:
+        description: целое число рублей
+        type: integer
+      service_name:
+        type: string
+      start_date:
+        description: месяц и год
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: REST API для агрегации данных об онлайн-подписках пользователей (тестовое
+    Effective Mobile)
+  title: Subscription Service API
+  version: "1.0"
+paths:
+  /subscriptions:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Данные подписки
+        in: body
+        name: subscription
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_razdolbaipozhizni_effective-mobile-subscription-service_internal_model.Subscription'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_razdolbaipozhizni_effective-mobile-subscription-service_internal_model.Subscription'
+      summary: Создать новую подписку
+      tags:
+      - subscriptions
+  /subscriptions/total:
+    get:
+      parameters:
+      - description: ID пользователя
+        in: query
+        name: user_id
+        type: string
+      - description: Название сервиса
+        in: query
+        name: service_name
+        type: string
+      - description: Начало периода (MM-YYYY)
+        in: query
+        name: start_period
+        required: true
+        type: string
+      - description: Конец периода (MM-YYYY)
+        in: query
+        name: end_period
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              total:
+                type: integer
+            type: object
+      summary: Подсчёт суммарной стоимости подписок за период
+      tags:
+      - subscriptions
+swagger: "2.0"

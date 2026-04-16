@@ -16,6 +16,26 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/subscriptions": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "subscriptions"
+                ],
+                "summary": "Получить список всех подписок",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Subscription"
+                            }
+                        }
+                    }
+                }
+            },
             "post": {
                 "consumes": [
                     "application/json"
@@ -34,7 +54,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_razdolbaipozhizni_effective-mobile-subscription-service_internal_model.Subscription"
+                            "$ref": "#/definitions/model.Subscription"
                         }
                     }
                 ],
@@ -42,7 +62,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_razdolbaipozhizni_effective-mobile-subscription-service_internal_model.Subscription"
+                            "$ref": "#/definitions/model.Subscription"
                         }
                     }
                 }
@@ -60,7 +80,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID пользователя",
+                        "description": "ID пользователя (UUID)",
                         "name": "user_id",
                         "in": "query"
                     },
@@ -99,37 +119,121 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/subscriptions/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "subscriptions"
+                ],
+                "summary": "Получить подписку по ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID подписки",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Subscription"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "subscriptions"
+                ],
+                "summary": "Обновить данные подписки",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID подписки",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Новые данные",
+                        "name": "subscription",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Subscription"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Subscription"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "subscriptions"
+                ],
+                "summary": "Удалить подписку",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID подписки",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
         }
     },
     "definitions": {
-        "github_com_razdolbaipozhizni_effective-mobile-subscription-service_internal_model.Subscription": {
+        "model.Subscription": {
             "type": "object",
             "properties": {
                 "created_at": {
                     "type": "string"
                 },
                 "end_date": {
-                    "description": "может быть null",
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
                 "price": {
-                    "description": "целое число рублей",
                     "type": "integer"
                 },
                 "service_name": {
                     "type": "string"
                 },
                 "start_date": {
-                    "description": "месяц и год",
                     "type": "string"
                 },
                 "updated_at": {
                     "type": "string"
                 },
                 "user_id": {
+                    "description": "Возвращаем uuid.UUID",
                     "type": "string"
                 }
             }
@@ -144,7 +248,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Subscription Service API",
-	Description:      "REST API для агрегации данных об онлайн-подписках пользователей (тестовое Effective Mobile)",
+	Description:      "REST API для агрегации данных об онлайн-подписках пользователей",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

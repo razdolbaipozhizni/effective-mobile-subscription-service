@@ -65,8 +65,12 @@ func main() {
 	// Роуты
 	subscriptions := r.Group("/subscriptions")
 	{
-		subscriptions.POST("", h.Create)
-		subscriptions.GET("/total", h.GetTotalCost)
+		subscriptions.POST("", h.Create)             // Create
+		subscriptions.GET("", h.GetAll)             // List
+		subscriptions.GET("/:id", h.GetByID)        // Read
+		subscriptions.PUT("/:id", h.Update)         // Update
+		subscriptions.DELETE("/:id", h.Delete)      // Delete
+		subscriptions.GET("/total", h.GetTotalCost) // Специальный метод расчета
 	}
 
 	// Запуск сервера

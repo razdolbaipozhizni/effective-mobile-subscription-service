@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -46,6 +47,77 @@ func (h *SubscriptionHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, sub)
 }
 
+// GetAll godoc
+// @Summary Получить список всех подписок
+// @Tags subscriptions
+// @Produce json
+// @Success 200 {array} model.Subscription
+// @Router /subscriptions [get]
+func (h *SubscriptionHandler) GetAll(c *gin.Context) {
+	subs, err := h.service.GetAll()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, subs)
+}
+
+// GetByID godoc
+// @Summary Получить подписку по ID
+// @Tags subscriptions
+// @Produce json
+// @Param id path int true "ID подписки"
+// @Success 200 {object} model.Subscription
+// @Router /subscriptions/{id} [get]
+func (h *SubscriptionHandler) GetByID(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+	sub, err := h.service.GetByID(uint(id))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "subscription not found"})
+		return
+	}
+	c.JSON(http.StatusOK, sub)
+}
+
+// Update godoc
+// @Summary Обновить данные подписки
+// @Tags subscriptions
+// @Accept json
+// @Produce json
+// @Param id path int true "ID подписки"
+// @Param subscription body model.Subscription true "Новые данные"
+// @Success 200 {object} model.Subscription
+// @Router /subscriptions/{id} [put]
+func (h *SubscriptionHandler) Update(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+	var sub model.Subscription
+	if err := c.ShouldBindJSON(&sub); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := h.service.Update(uint(id), &sub); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "updated successfully"})
+}
+
+// Delete godoc
+// @Summary Удалить подписку
+// @Tags subscriptions
+// @Param id path int true "ID подписки"
+// @Success 204 "No Content"
+// @Router /subscriptions/{id} [delete]
+func (h *SubscriptionHandler) Delete(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+	if err := h.service.Delete(uint(id)); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.Status(http.StatusNoContent)
+}
+
 // GetTotalCost godoc
 // @Summary Подсчёт суммарной стоимости подписок за период
 // @Tags subscriptions
@@ -57,7 +129,6 @@ func (h *SubscriptionHandler) Create(c *gin.Context) {
 // @Success 200 {object} object{total=int}
 // @Router /subscriptions/total [get]
 func (h *SubscriptionHandler) GetTotalCost(c *gin.Context) {
-	// Получаем параметры из query. Используем "=" вместо ":=", чтобы не плодить переменные
 	userIDStr := c.Query("user_id")
 	serviceName := c.Query("service_name")
 	startStr := c.Query("start_period")
@@ -80,8 +151,7 @@ func (h *SubscriptionHandler) GetTotalCost(c *gin.Context) {
 		return
 	}
 
-	// Обработка UUID пользователя
-	var uIDPtr *uuid.UUID // Используем уникальное имя переменной, чтобы избежать redeclared
+	var uIDPtr *uuid.UUID
 	if userIDStr != "" {
 		parsedUID, err := uuid.Parse(userIDStr)
 		if err != nil {
@@ -96,7 +166,6 @@ func (h *SubscriptionHandler) GetTotalCost(c *gin.Context) {
 		svcNamePtr = &serviceName
 	}
 
-	// Вызываем сервис с UUID
 	total, err := h.service.GetTotalCost(uIDPtr, svcNamePtr, startPeriod, endPeriod)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

@@ -12,7 +12,7 @@ type SubscriptionRepository interface {
 	Create(sub *model.Subscription) error
 	GetByID(id uint) (*model.Subscription, error)
 	GetAll() ([]model.Subscription, error)
-	Update(sub *model.Subscription) error
+	Update(id uint, sub *model.Subscription) error
 	Delete(id uint) error
 	GetTotalCost(userID *uuid.UUID, serviceName *string, startPeriod, endPeriod time.Time) (int, error)
 }
@@ -41,8 +41,9 @@ func (r *subscriptionRepo) GetAll() ([]model.Subscription, error) {
 	return subs, err
 }
 
-func (r *subscriptionRepo) Update(sub *model.Subscription) error {
-	return r.db.Save(sub).Error
+func (r *subscriptionRepo) Update(id uint, sub *model.Subscription) error {
+	// Updates обновляет только измененные поля
+	return r.db.Model(&model.Subscription{}).Where("id = ?", id).Updates(sub).Error
 }
 
 func (r *subscriptionRepo) Delete(id uint) error {

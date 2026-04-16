@@ -12,7 +12,7 @@ type SubscriptionService interface {
 	Create(sub *model.Subscription) error
 	GetByID(id uint) (*model.Subscription, error)
 	GetAll() ([]model.Subscription, error)
-	Update(sub *model.Subscription) error
+	Update(id uint, sub *model.Subscription) error // Добавили id
 	Delete(id uint) error
 	GetTotalCost(userID *uuid.UUID, serviceName *string, startPeriod, endPeriod time.Time) (int, error)
 }
@@ -37,8 +37,8 @@ func (s *subscriptionService) GetAll() ([]model.Subscription, error) {
 	return s.repo.GetAll()
 }
 
-func (s *subscriptionService) Update(sub *model.Subscription) error {
-	return s.repo.Update(sub)
+func (s *subscriptionService) Update(id uint, sub *model.Subscription) error {
+	return s.repo.Update(id, sub) // Передаем id в репозиторий
 }
 
 func (s *subscriptionService) Delete(id uint) error {

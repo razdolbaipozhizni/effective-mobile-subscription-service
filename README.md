@@ -62,3 +62,7 @@ Docker & Docker Compose (Infrastrucure)
 Swaggo (Swagger docs)
 
 Zerolog (Logging)
+
+Google UUID — работа с идентификаторами формата UUID
+
+Viper — мощная библиотека для работы с форматами JSON, TOML, YAML, ENV

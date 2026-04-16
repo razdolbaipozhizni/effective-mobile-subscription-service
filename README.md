@@ -63,6 +63,6 @@ Swaggo (Swagger docs)
 
 Zerolog (Logging)
 
-Google UUID — работа с идентификаторами формата UUID
+Google UUID (библиотека для работы с идентификаторами формата UUID)
 
-Viper — мощная библиотека для работы с форматами JSON, TOML, YAML, ENV
+Viper (библиотека для работы с форматами JSON, TOML, YAML, ENV)
